@@ -1,0 +1,136 @@
+{% extends "layout.html" %}
+
+{% block title %}Member Statistics{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-5 fw-bold"><i class="fas fa-users-cog me-2"></i>Member Statistics</h1>
+        <div>
+            <a href="{{ url_for('members') }}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Members
+            </a>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm card-glass">
+                <div class="card-body text-center">
+                    <h1 class="display-4 fw-bold text-primary">{{ stats.total_members }}</h1>
+                    <p class="text-muted mb-0">Total Members</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm card-glass">
+                <div class="card-body text-center">
+                    <h1 class="display-4 fw-bold text-success">{{ stats.status_count }}</h1>
+                    <p class="text-muted mb-0">Membership Types</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow-sm card-glass mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Membership Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="membershipChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm card-glass mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-book-reader me-2"></i>Most Active Members</h5>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        {% for member in active_members %}
+                        <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="badge bg-secondary rounded-circle me-2">{{ loop.index }}</span>
+                                <strong>{{ member.first_name }} {{ member.last_name }}</strong>
+                            </div>
+                            <span class="badge bg-primary rounded-pill">{{ member.loan_count }} books</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm card-glass">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Members with Overdue Books</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Member Name</th>
+                                    <th>Overdue Books</th>
+                                    <th>Total Fines</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for member in members_with_overdue %}
+                                <tr>
+                                    <td>{{ member.first_name }} {{ member.last_name }}</td>
+                                    <td>{{ member.overdue_count }}</td>
+                                    <td>${{ member.total_fines | round(2) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Membership Type Chart
+        const membershipLabels = [{% for status in membership_statuses %}'{{ status.membership_status }}',{% endfor %}];
+        const membershipData = [{% for status in membership_statuses %}{{ status.count }},{% endfor %}];
+        const membershipColors = [
+            '#0d6efd', '#6610f2', '#6f42c1', '#d63384', '#dc3545', 
+            '#fd7e14', '#ffc107', '#198754', '#20c997', '#0dcaf0'
+        ];
+
+        const membershipCtx = document.getElementById('membershipChart');
+        new Chart(membershipCtx, {
+            type: 'pie',
+            data: {
+                labels: membershipLabels,
+                datasets: [{
+                    data: membershipData,
+                    backgroundColor: membershipColors,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %} 

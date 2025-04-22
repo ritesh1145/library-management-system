@@ -1,0 +1,328 @@
+{% extends "layout.html" %}
+
+{% block title %}Register New Member - Library Management System{% endblock %}
+
+{% block content %}
+<div class="row mb-4 animate-fade-in">
+    <div class="col-md-12">
+        <h1 class="display-5 fw-bold mb-3">
+            <i class="fas fa-user-plus me-2 text-primary"></i>Register New Member
+        </h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('members') }}">Members</a></li>
+                <li class="breadcrumb-item active">Register New Member</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow-sm card-glass animate-slide-up">
+            <div class="card-header bg-light">
+                <h5 class="mb-0"><i class="fas fa-id-card me-2"></i>Member Information</h5>
+            </div>
+            <div class="card-body">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+                {% endwith %}
+
+                <form method="POST" action="{{ url_for('add_member') }}" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    {{ form.csrf_token }}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control {% if form.name.errors %}is-invalid{% endif %}" id="name" name="name" value="{{ form.name.data or '' }}" required>
+                            {% if form.name.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.name.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control {% if form.email.errors %}is-invalid{% endif %}" id="email" name="email" value="{{ form.email.data or '' }}" required>
+                            {% if form.email.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.email.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="phone" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control {% if form.phone.errors %}is-invalid{% endif %}" id="phone" name="phone" value="{{ form.phone.data or '' }}">
+                            {% if form.phone.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.phone.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="membership_type" class="form-label">Membership Type <span class="text-danger">*</span></label>
+                            <select class="form-select {% if form.membership_type.errors %}is-invalid{% endif %}" id="membership_type" name="membership_type" required>
+                                <option value="" selected disabled>Select a membership type</option>
+                                <option value="student" {% if form.membership_type.data == 'student' %}selected{% endif %}>Student</option>
+                                <option value="faculty" {% if form.membership_type.data == 'faculty' %}selected{% endif %}>Faculty</option>
+                                <option value="standard" {% if form.membership_type.data == 'standard' %}selected{% endif %}>Standard</option>
+                                <option value="premium" {% if form.membership_type.data == 'premium' %}selected{% endif %}>Premium</option>
+                            </select>
+                            {% if form.membership_type.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.membership_type.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-12">
+                            <label for="address" class="form-label">Address</label>
+                            <textarea class="form-control {% if form.address.errors %}is-invalid{% endif %}" id="address" name="address" rows="2">{{ form.address.data or '' }}</textarea>
+                            {% if form.address.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.address.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="date_of_birth" class="form-label">Date of Birth</label>
+                            <input type="date" class="form-control {% if form.date_of_birth.errors %}is-invalid{% endif %}" id="date_of_birth" name="date_of_birth" value="{{ form.date_of_birth.data or '' }}">
+                            {% if form.date_of_birth.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.date_of_birth.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="id_proof" class="form-label">ID Proof</label>
+                            <input type="file" class="form-control {% if form.id_proof.errors %}is-invalid{% endif %}" id="id_proof" name="id_proof">
+                            {% if form.id_proof.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.id_proof.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            <div class="form-text">Upload a scan or photo of an ID document (Max size: 2MB)</div>
+                        </div>
+                        
+                        <div class="col-md-12">
+                            <label for="notes" class="form-label">Additional Notes</label>
+                            <textarea class="form-control {% if form.notes.errors %}is-invalid{% endif %}" id="notes" name="notes" rows="2">{{ form.notes.data or '' }}</textarea>
+                            {% if form.notes.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.notes.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-12">
+                            <div class="form-check">
+                                <input class="form-check-input {% if form.agree_terms.errors %}is-invalid{% endif %}" type="checkbox" id="agree_terms" name="agree_terms" {% if form.agree_terms.data %}checked{% endif %} required>
+                                <label class="form-check-label" for="agree_terms">
+                                    I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">terms and conditions</a> <span class="text-danger">*</span>
+                                </label>
+                                {% if form.agree_terms.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.agree_terms.errors %}
+                                    {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-secondary" onclick="window.location.href='{{ url_for('members') }}'">
+                            <i class="fas fa-arrow-left me-1"></i>Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-user-plus me-1"></i>Register Member
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card shadow-sm card-glass animate-slide-right">
+            <div class="card-header bg-light">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Membership Benefits</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group mb-4">
+                    <div class="list-group-item list-group-item-action bg-transparent d-flex justify-content-between align-items-center">
+                        <strong>Student</strong>
+                        <span class="badge bg-primary rounded-pill">Free</span>
+                    </div>
+                    <div class="list-group-item bg-transparent">
+                        <ul class="mb-0 ps-3 small">
+                            <li>Borrow up to 3 books at a time</li>
+                            <li>14-day loan period</li>
+                            <li>Access to online resources</li>
+                            <li>Valid student ID required</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="list-group-item list-group-item-action bg-transparent d-flex justify-content-between align-items-center">
+                        <strong>Faculty</strong>
+                        <span class="badge bg-primary rounded-pill">Free</span>
+                    </div>
+                    <div class="list-group-item bg-transparent">
+                        <ul class="mb-0 ps-3 small">
+                            <li>Borrow up to 5 books at a time</li>
+                            <li>30-day loan period</li>
+                            <li>Access to research databases</li>
+                            <li>Faculty ID required</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="list-group-item list-group-item-action bg-transparent d-flex justify-content-between align-items-center">
+                        <strong>Standard</strong>
+                        <span class="badge bg-primary rounded-pill">₹500/year</span>
+                    </div>
+                    <div class="list-group-item bg-transparent">
+                        <ul class="mb-0 ps-3 small">
+                            <li>Borrow up to 2 books at a time</li>
+                            <li>14-day loan period</li>
+                            <li>Basic online resources</li>
+                            <li>Any valid ID proof</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="list-group-item list-group-item-action bg-transparent d-flex justify-content-between align-items-center">
+                        <strong>Premium</strong>
+                        <span class="badge bg-primary rounded-pill">₹1500/year</span>
+                    </div>
+                    <div class="list-group-item bg-transparent">
+                        <ul class="mb-0 ps-3 small">
+                            <li>Borrow up to 5 books at a time</li>
+                            <li>30-day loan period</li>
+                            <li>Full access to all resources</li>
+                            <li>Priority book requests</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info mb-0 small">
+                    <h6 class="alert-heading"><i class="fas fa-lightbulb me-2"></i>Need Help?</h6>
+                    <p class="mb-0">Contact library staff if you need assistance choosing the right membership type or have questions about member benefits.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Terms and Conditions Modal -->
+<div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="termsModalLabel">Library Membership Terms and Conditions</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>1. Membership Eligibility and Registration</h6>
+                <p>Members must provide accurate personal information during registration. The library reserves the right to verify the information provided and may require additional documentation for proof of identity or address.</p>
+                
+                <h6>2. Membership Cards</h6>
+                <p>Members will be issued a membership card that must be presented when borrowing materials. Lost or damaged cards must be reported immediately, and a replacement fee may apply.</p>
+                
+                <h6>3. Borrowing Rules</h6>
+                <p>Members must adhere to borrowing limits and loan periods specific to their membership type. Materials must be returned in the same condition as when borrowed.</p>
+                
+                <h6>4. Renewals and Reservations</h6>
+                <p>Members may renew borrowed materials if there are no pending reservations. Renewals must be requested before the due date.</p>
+                
+                <h6>5. Late Returns and Fines</h6>
+                <p>Late returns will result in fines as per the library's fine policy. Excessive fines may result in suspension of borrowing privileges until cleared.</p>
+                
+                <h6>6. Lost or Damaged Materials</h6>
+                <p>Members are responsible for lost or damaged materials and will be charged the replacement cost plus a processing fee.</p>
+                
+                <h6>7. Privacy Policy</h6>
+                <p>The library respects member privacy and will only use personal information for library-related purposes. Member data will not be shared with third parties without consent.</p>
+                
+                <h6>8. Code of Conduct</h6>
+                <p>Members must maintain proper behavior within the library premises. Disruptive behavior may result in suspension or termination of membership.</p>
+                
+                <h6>9. Changes to Terms</h6>
+                <p>The library reserves the right to modify these terms at any time. Members will be notified of significant changes.</p>
+                
+                <h6>10. Membership Termination</h6>
+                <p>The library reserves the right to terminate membership for violation of these terms or library policies.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">I Understand</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Client-side form validation
+    (function() {
+        'use strict'
+        
+        // Fetch all forms to apply validation
+        var forms = document.querySelectorAll('.needs-validation')
+        
+        // Loop over and prevent submission
+        Array.prototype.slice.call(forms)
+            .forEach(function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    
+                    form.classList.add('was-validated')
+                }, false)
+            })
+    })()
+    
+    // Update form fields based on membership type
+    document.getElementById('membership_type').addEventListener('change', function() {
+        const membershipType = this.value;
+        const notesField = document.getElementById('notes');
+        
+        if (membershipType === 'student') {
+            notesField.placeholder = 'Enter student ID, course, and year of study...';
+        } else if (membershipType === 'faculty') {
+            notesField.placeholder = 'Enter faculty ID, department, and designation...';
+        } else if (membershipType === 'standard' || membershipType === 'premium') {
+            notesField.placeholder = 'Enter any additional information...';
+        }
+    });
+</script>
+{% endblock %} 

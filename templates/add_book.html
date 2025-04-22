@@ -1,0 +1,103 @@
+{% extends "layout.html" %}
+
+{% block title %}Add Book - Library Management System{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1 class="display-5 fw-bold">
+            <i class="fas fa-plus-circle me-2"></i>Add New Book
+        </h1>
+        <p class="lead">Add a new book to your library collection.</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Book Information</h5>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('add_book') }}" method="post">
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label for="title" class="form-label">Title <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="title" name="title" required>
+                        </div>
+                        
+                        <div class="col-md-12">
+                            <label for="author" class="form-label">Author <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="author" name="author" required>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="isbn" class="form-label">ISBN</label>
+                            <input type="text" class="form-control" id="isbn" name="isbn" placeholder="e.g. 9780743273565">
+                            <div class="form-text">International Standard Book Number</div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="publication_year" class="form-label">Publication Year</label>
+                            <input type="number" class="form-control" id="publication_year" name="publication_year" placeholder="e.g. 2022" min="1000" max="{{ current_year }}">
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="category" class="form-label">Category</label>
+                            <select class="form-select" id="category" name="category">
+                                <option value="">Select category...</option>
+                                <option value="Fiction">Fiction</option>
+                                <option value="Non-Fiction">Non-Fiction</option>
+                                <option value="Science Fiction">Science Fiction</option>
+                                <option value="Fantasy">Fantasy</option>
+                                <option value="Mystery">Mystery</option>
+                                <option value="Thriller">Thriller</option>
+                                <option value="Romance">Romance</option>
+                                <option value="Biography">Biography</option>
+                                <option value="History">History</option>
+                                <option value="Science">Science</option>
+                                <option value="Technology">Technology</option>
+                                <option value="Computer Science">Computer Science</option>
+                                <option value="Philosophy">Philosophy</option>
+                                <option value="Psychology">Psychology</option>
+                                <option value="Self-Help">Self-Help</option>
+                                <option value="Children">Children</option>
+                                <option value="Classic">Classic</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="shelf_location" class="form-label">Shelf Location</label>
+                            <input type="text" class="form-control" id="shelf_location" name="shelf_location" placeholder="e.g. A-12">
+                            <div class="form-text">Physical location identifier in the library</div>
+                        </div>
+                        
+                        <div class="col-12 mt-4">
+                            <hr>
+                            <div class="d-flex justify-content-between">
+                                <a href="{{ url_for('books') }}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left me-2"></i>Back to Books
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Save Book
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Set current year as max for publication year
+    $(document).ready(function() {
+        const currentYear = new Date().getFullYear();
+        $('#publication_year').attr('max', currentYear);
+    });
+</script>
+{% endblock %} 

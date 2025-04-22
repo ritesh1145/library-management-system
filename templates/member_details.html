@@ -1,0 +1,195 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ member.first_name }} {{ member.last_name }} - Library Management System{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('members') }}">Members</a></li>
+                <li class="breadcrumb-item active">{{ member.first_name }} {{ member.last_name }}</li>
+            </ol>
+        </nav>
+        <h1 class="display-5 fw-bold">
+            <i class="fas fa-user me-2"></i>{{ member.first_name }} {{ member.last_name }}
+        </h1>
+        <p class="lead">Member details and loan history.</p>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Member Info Card -->
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Member Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <div class="bg-primary rounded-circle d-inline-block p-3 mb-3">
+                        <i class="fas fa-user text-white" style="font-size: 3rem;"></i>
+                    </div>
+                    <h4>{{ member.first_name }} {{ member.last_name }}</h4>
+                    <p class="text-muted mb-0">Member ID: {{ member.member_id }}</p>
+                    <p>
+                        {% if member.membership_status == 'Active' %}
+                        <span class="badge bg-success">{{ member.membership_status }}</span>
+                        {% elif member.membership_status == 'Expired' %}
+                        <span class="badge bg-warning">{{ member.membership_status }}</span>
+                        {% else %}
+                        <span class="badge bg-danger">{{ member.membership_status }}</span>
+                        {% endif %}
+                    </p>
+                </div>
+                
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <th scope="row"><i class="fas fa-envelope me-2"></i>Email</th>
+                            <td>{{ member.email }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><i class="fas fa-phone me-2"></i>Phone</th>
+                            <td>{{ member.phone }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><i class="fas fa-map-marker-alt me-2"></i>Address</th>
+                            <td>{{ member.address }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><i class="fas fa-calendar-alt me-2"></i>Join Date</th>
+                            <td class="format-date">{{ member.join_date }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="d-grid gap-2 mt-3">
+                    <a href="{{ url_for('add_loan') }}?member_id={{ member.member_id }}" class="btn btn-primary">
+                        <i class="fas fa-book me-2"></i>Issue New Loan
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Current Loans -->
+    <div class="col-md-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-light">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Current Loans</h5>
+                    <span class="badge bg-primary">{{ loans|length }}</span>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">Book</th>
+                                <th scope="col">Author</th>
+                                <th scope="col">Borrowed On</th>
+                                <th scope="col">Due Date</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if loans %}
+                                {% for loan in loans %}
+                                <tr class="check-overdue" data-due-date="{{ loan.due_date }}">
+                                    <td>{{ loan.title }}</td>
+                                    <td>{{ loan.author }}</td>
+                                    <td class="format-date">{{ loan.loan_date }}</td>
+                                    <td class="format-date">{{ loan.due_date }}</td>
+                                    <td>
+                                        {% if loan.status == 'Borrowed' %}
+                                        <span class="badge bg-warning">{{ loan.status }}</span>
+                                        {% elif loan.status == 'Overdue' %}
+                                        <span class="badge bg-danger">{{ loan.status }}</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">{{ loan.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <form action="{{ url_for('return_book') }}" method="post" class="d-inline" onsubmit="return confirm('Confirm book return?');">
+                                            <input type="hidden" name="loan_id" value="{{ loan.loan_id }}">
+                                            <button type="submit" class="btn btn-sm btn-outline-success">
+                                                <i class="fas fa-undo me-1"></i>Return
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            No active loans for this member.
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Loan History -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Loan History</h5>
+                    <span class="badge bg-secondary">{{ history|length }}</span>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">Book</th>
+                                <th scope="col">Author</th>
+                                <th scope="col">Borrowed On</th>
+                                <th scope="col">Returned On</th>
+                                <th scope="col">Fine</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if history %}
+                                {% for loan in history %}
+                                <tr>
+                                    <td>{{ loan.title }}</td>
+                                    <td>{{ loan.author }}</td>
+                                    <td class="format-date">{{ loan.loan_date }}</td>
+                                    <td class="format-date">{{ loan.return_date }}</td>
+                                    <td>
+                                        {% if loan.fine_amount and loan.fine_amount > 0 %}
+                                        <span class="text-danger">${{ loan.fine_amount|float|round(2) }}</span>
+                                        {% else %}
+                                        <span class="text-success">$0.00</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            No loan history for this member.
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
